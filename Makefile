@@ -54,7 +54,7 @@ endif
 ifeq ($(LAB),net)
 OBJS += \
 	$K/e1000.o \
-	$K/net.o \
+	$K/net.o \y
 	$K/sysnet.o \
 	$K/pci.o
 endif
@@ -183,6 +183,7 @@ UPROGS=\
 	$U/_mkdir\
 	$U/_rm\
 	$U/_sh\
+	$U/_sleep\
 	$U/_stressfs\
 	$U/_usertests\
 	$U/_grind\
