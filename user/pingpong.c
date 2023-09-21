@@ -9,6 +9,7 @@ main(int argc, char *argv[])
   
   p[0] = getpid();
   p[1] = fork();
+  pipe(p);
   fprintf(0, "%d" ,getpid());
 
   exit(0);
