@@ -91,3 +91,20 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_trace(void)
+{
+   // ulozit argument systemoveho volania do novej premnennej v strukture proc
+   int syscall;
+   argint(0, &syscall);
+   return syscall;
+}
+
+uint64
+sys_square(void)
+{
+    int a;
+    argint(0, &a);
+    return (a*a);
+}
