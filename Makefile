@@ -189,6 +189,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_trace\
 	$U/_square\
+	$U/_cp\
 
 
 
