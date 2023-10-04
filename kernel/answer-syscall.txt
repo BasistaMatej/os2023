@@ -1,4 +1,4 @@
-
+usertrap() in kernel/trap.c
 0x7 /SYS_exec/
-prilivegovany
+prilivegovany(user) pretoze SPP bit je nastaveny na 0
 kerneltrap
