@@ -92,3 +92,33 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_sigreturn(void) {
+  struct proc* procCurr;
+
+  procCurr = myproc();
+  procCurr->tics = 0;
+  procCurr->pointerFun = 0;
+  procCurr->currentTic = 0;
+  *procCurr->trapframe = procCurr->alarm_state;
+  procCurr->isCalledAlarm = 0;
+
+  return 0;
+}
+
+uint64
+sys_sigalarm(void) {
+  int ticks;
+  uint64 handler;
+  struct proc* procCurr;
+
+  argint(0, &ticks);
+  argaddr(1, &handler);
+  
+  procCurr = myproc();
+  procCurr->tics = ticks;
+  procCurr->pointerFun = handler;
+
+  return 0;
+}

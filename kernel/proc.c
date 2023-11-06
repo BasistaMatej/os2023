@@ -119,6 +119,7 @@ allocproc(void)
       release(&p->lock);
     }
   }
+  p->currentTic = 0;
   return 0;
 
 found:
