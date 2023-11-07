@@ -51,6 +51,7 @@ usertrap(void)
   p->trapframe->epc = r_sepc();
   
   if(r_scause() == 8){
+    printf("%d",r_scause());
     // system call
 
     if(killed(p))
