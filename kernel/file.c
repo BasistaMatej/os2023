@@ -19,6 +19,42 @@ struct {
   struct file file[NFILE];
 } ftable;
 
+struct {
+  struct spinlock lock;
+  struct vma vma[NVMA];
+} vma_table;
+
+void
+vmainit(void)
+{
+  initlock(&vma_table.lock, "vma_table");
+}
+
+
+struct vma*
+vmaalloc(void)
+{
+  struct vma* vma;
+  acquire(&vma_table.lock);
+  for(vma = vma_table.vma; vma < vma_table.vma + NVMA; vma++) {
+    if (!vma->used) {
+      vma->used = 1;
+      release(&vma_table.lock);
+      return vma;
+    }
+  }
+  release(&vma_table.lock);
+  return 0;
+}
+
+void
+vmadealloc(struct vma* vma)
+{
+  acquire(&vma_table.lock);
+  memset(vma, 0, sizeof(vma));
+  release(&vma_table.lock);
+}
+
 void
 fileinit(void)
 {

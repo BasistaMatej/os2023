@@ -55,6 +55,7 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      p->max_addr = MAXVMA;
   }
 }
 
@@ -169,6 +170,8 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  memset(p->vma, 0, sizeof(p->vma));
+  p->max_addr = MAXVMA;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -320,6 +323,23 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+
+  for (int i = 0; i < NVMA; i++) {
+    struct vma *new_vma = 0, *vma = p->vma[i];
+    if (vma) {
+      if ((new_vma = vmaalloc()) == 0)
+        panic("fork: no enough vma");
+      new_vma->file = filedup(vma->file);
+      new_vma->start = vma->start;
+      new_vma->end = vma->end;
+      new_vma->prot = vma->prot;
+      new_vma->flags = vma->flags;
+      new_vma->length = vma->length;
+    }
+    np->vma[i] = new_vma;
+  }
+
+  np->max_addr = p->max_addr;
   release(&np->lock);
 
   return pid;
@@ -350,6 +370,22 @@ exit(int status)
 
   if(p == initproc)
     panic("init exiting");
+
+  for (int i = 0; i < NVMA; i++) {
+    if (p->vma[i]) {
+      uint64 start;
+      if ((start = walkaddr(p->pagetable, p->vma[i]->start))) {
+        struct vma *vp = p->vma[i];
+        uvmunmap(p->pagetable, PGROUNDDOWN(vp->start), (vp->end - PGROUNDDOWN(vp->start)) / PGSIZE, 1);
+
+      }
+      fileclose(p->vma[i]->file);
+      vmadealloc(p->vma[i]);
+      p->vma[i] = 0;
+    }
+  }
+
+  p->max_addr = MAXVMA;
 
   // Close all open files.
   for(int fd = 0; fd < NOFILE; fd++){

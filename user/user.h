@@ -54,3 +54,6 @@ void *memcpy(void *, const void *, uint);
 #ifdef LAB_LOCK
 int statistics(void*, int);
 #endif
+
+void *mmap(void *addr, int length, int prot, int flags, int fd, int offset);
+int munmap(void *addr, int length);
